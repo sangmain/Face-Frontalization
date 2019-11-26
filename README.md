@@ -6,13 +6,13 @@ Created: Nov 26, 2019 4:48 PM
 
 This project generates frontal faces of any human being's faces.
 
-![](./Git_images/-7b380c28-e8af-41b4-8475-04d7a9ec73af.png)
+![](./Git_images/Untitled-7b380c28-e8af-41b4-8475-04d7a9ec73af.png)
 
-![](./Git_images/-bd2972f3-9acd-4fa3-af88-616cc0b02b5b.png)
+![](./Git_images/Untitled-bd2972f3-9acd-4fa3-af88-616cc0b02b5b.png)
 
-![](./Git_images/-e29b4a05-cae9-4dde-b180-115b462ce453.png)
+![](./Git_images/Untitled-e29b4a05-cae9-4dde-b180-115b462ce453.png)
 
-![](./Git_images/-dd10c67f-d76c-4152-a275-5607d588070c.png)
+![](./Git_images/Untitled-dd10c67f-d76c-4152-a275-5607d588070c.png)
 
 # Data
 
@@ -22,9 +22,9 @@ Data is consisted of 300 korean face data
 
 [AI 오픈 이노베이션 허브](http://aihub.or.kr/)
 
-![](./Git_images/-ffeeea0f-20d6-4997-a6ed-2259344f0213.png)
+![](./Git_images/Untitled-ffeeea0f-20d6-4997-a6ed-2259344f0213.png)
 
-![](./Git_images/-fa9a5245-a71e-47dc-9e08-1daff4b429ac.png)
+![](./Git_images/Untitled-fa9a5245-a71e-47dc-9e08-1daff4b429ac.png)
 
 # Data Preprocessing
 
@@ -34,7 +34,7 @@ Crop only face pixels of original image to **maximize the feature extraction eff
 
 Used functions and pretrained models in **Dlib** to crop faces
 
-![](./Git_images/-ec76aa17-6d43-4511-b704-ec4ad904cd9c.png)
+![](./Git_images/Untitled-ec76aa17-6d43-4511-b704-ec4ad904cd9c.png)
 
 First, we try cropping image by using **Frontal face detector by Dlib**
 
@@ -67,15 +67,15 @@ So in total 1,700,000 face data, almost half is lost because in train datasets u
 
 The image below shows the Distribution of face tilt degree.
 
-![](./Git_images/-3fa3a8d1-89c1-44dc-8552-74660a1bc0f9.png)
+![](./Git_images/Untitled-3fa3a8d1-89c1-44dc-8552-74660a1bc0f9.png)
 
 ### Train Input
 
-![](./Git_images/-f8b70783-a082-4b1c-b62d-981c040c7340.png)
+![](./Git_images/Untitled-f8b70783-a082-4b1c-b62d-981c040c7340.png)
 
 ### Train Label
 
-![](./Git_images/-39a27425-8087-4006-9ff9-05443f18a911.png)
+![](./Git_images/Untitled-39a27425-8087-4006-9ff9-05443f18a911.png)
 
 # DataGenerator
 
@@ -104,9 +104,9 @@ At first, we used different data to train and also did not crop faces.
 
 So the output was too blury which seems like model could not make extract face features.
 
-![](./Git_images/-445557de-3260-417d-97bd-ddce46dcd750.png)
+![](./Git_images/Untitled-445557de-3260-417d-97bd-ddce46dcd750.png)
 
-![](./Git_images/-b811d811-efbb-494d-8f59-03f5c780a088.png)
+![](./Git_images/Untitled-b811d811-efbb-494d-8f59-03f5c780a088.png)
 
 So after this model, we decided to **input cropped faces**, not the entire image
 
@@ -116,9 +116,9 @@ So after this model, we decided to **input cropped faces**, not the entire image
 
 DCGan did not work quite well
 
-![](./Git_images/-0c9c88a2-1610-4634-8c53-4a5c4c21ba2e.png)
+![](./Git_images/Untitled-0c9c88a2-1610-4634-8c53-4a5c4c21ba2e.png)
 
-![](./Git_images/-53c19532-efc1-482f-bd7f-45844f2e8b86.png)
+![](./Git_images/Untitled-53c19532-efc1-482f-bd7f-45844f2e8b86.png)
 
 ## Autoencoder + Unet ( Best Model )
 
@@ -126,9 +126,9 @@ After research, we decided to use **VGG16 Face** (pretrained model which extract
 
 And by researching more, we found **Patch Gan** which uses **Unet** to connect layers of encoder and decoders to **retrieve lost data.** 
 
-![](./Git_images/-c18c1b92-e7dd-4d31-8fa2-3a40a1c689f9.png)
+![](./Git_images/Untitled-c18c1b92-e7dd-4d31-8fa2-3a40a1c689f9.png)
 
-![](./Git_images/-2fd54661-b453-40cd-90d8-f9a8a124e9eb.png)
+![](./Git_images/Untitled-2fd54661-b453-40cd-90d8-f9a8a124e9eb.png)
 
 **Encoder:  VGG16 Face**
 
@@ -136,9 +136,9 @@ And by researching more, we found **Patch Gan** which uses **Unet** to connect l
 
 ## Pixel to Pixel Gan
 
-![](./Git_images/-3e87669b-ad82-44e5-9d42-3268ec8ebb9a.png)
+![](./Git_images/Untitled-3e87669b-ad82-44e5-9d42-3268ec8ebb9a.png)
 
-![](./Git_images/-1cd80787-f4cf-4c0e-9a72-313cc1725954.png)
+![](./Git_images/Untitled-1cd80787-f4cf-4c0e-9a72-313cc1725954.png)
 
 **Generator: Same as previous model (VGG16 + Unet)**
 
