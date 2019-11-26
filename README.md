@@ -3,11 +3,11 @@
 This project generates frontal faces of any human being's faces.
 
 ![](./Git_images/Untitled-7b380c28-e8af-41b4-8475-04d7a9ec73af.png)
-
+***
 ![](./Git_images/Untitled-bd2972f3-9acd-4fa3-af88-616cc0b02b5b.png)
-
+***
 ![](./Git_images/Untitled-e29b4a05-cae9-4dde-b180-115b462ce453.png)
-
+***
 ![](./Git_images/Untitled-dd10c67f-d76c-4152-a275-5607d588070c.png)
 
 # Data
@@ -15,11 +15,10 @@ This project generates frontal faces of any human being's faces.
 Data is consisted of 300 korean face data
 
 **You can download data here**
-
 [AI 오픈 이노베이션 허브](http://aihub.or.kr/)
 
 ![](./Git_images/Untitled-ffeeea0f-20d6-4997-a6ed-2259344f0213.png)
-
+***
 ![](./Git_images/Untitled-fa9a5245-a71e-47dc-9e08-1daff4b429ac.png)
 
 # Data Preprocessing
@@ -37,6 +36,8 @@ First, we try cropping image by using **Frontal face detector by Dlib**
 face_detector = dlib.get_frontal_face_detector()
 rects = face_detector(image, 1)
 ```
+
+
 If **Frontal face detector** does not find faces, try finding by using **MMOD human face detector**
 
 ```python
@@ -44,6 +45,7 @@ if len(rects) == 0:
     cnn_face_detector = dlib.cnn_face_detection_model_v1('./models/mmod_human_face_detector.dat')
     rects = cnn_face_detector(image, 1)
 ```
+
 
 Use 68 face landmark detections to get the entire face
 
@@ -54,6 +56,8 @@ pts = face_regressor(image, faceBoxRectangleS).parts()
 pts = np.array([[pt.x, pt.y] for pt in pts]).T
 roi_box = parse_roi_box_from_landmark(pts)
 ```
+
+
 And crop image using roi box
 
 ```python
