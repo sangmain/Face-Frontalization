@@ -1,9 +1,5 @@
 # Face Frontalization
 
-Created: Nov 26, 2019 4:48 PM
-
-# Face Frontalization
-
 This project generates frontal faces of any human being's faces.
 
 ![](./Git_images/Untitled-7b380c28-e8af-41b4-8475-04d7a9ec73af.png)
