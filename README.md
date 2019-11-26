@@ -37,28 +37,32 @@ Used functions and pretrained models in **Dlib** to crop faces
 ![](./Git_images/Untitled-ec76aa17-6d43-4511-b704-ec4ad904cd9c.png)
 
 First, we try cropping image by using **Frontal face detector by Dlib**
-
-    face_detector = dlib.get_frontal_face_detector()
-    rects = face_detector(image, 1)
-
+```python
+face_detector = dlib.get_frontal_face_detector()
+rects = face_detector(image, 1)
+```
 If **Frontal face detector** does not find faces, try finding by using **MMOD human face detector**
 
-    if len(rects) == 0:
-    	cnn_face_detector = dlib.cnn_face_detection_model_v1('./models/mmod_human_face_detector.dat')
-    	rects = cnn_face_detector(image, 1)
+```python
+if len(rects) == 0:
+    cnn_face_detector = dlib.cnn_face_detection_model_v1('./models/mmod_human_face_detector.dat')
+    rects = cnn_face_detector(image, 1)
+```
 
 Use 68 face landmark detections to get the entire face
 
-    dlib_landmark_model = 'models/shape_predictor_68_face_landmarks.dat'
-    face_regressor = dlib.shape_predictor(dlib_landmark_model)
-    pts = face_regressor(image, faceBoxRectangleS).parts()
-    pts = np.array([[pt.x, pt.y] for pt in pts]).T
-    roi_box = parse_roi_box_from_landmark(pts)
-
+```python
+dlib_landmark_model = 'models/shape_predictor_68_face_landmarks.dat'
+face_regressor = dlib.shape_predictor(dlib_landmark_model)
+pts = face_regressor(image, faceBoxRectangleS).parts()
+pts = np.array([[pt.x, pt.y] for pt in pts]).T
+roi_box = parse_roi_box_from_landmark(pts)
+```
 And crop image using roi box
 
-    cropped_image = crop_img(image, roi_box)
-
+```python
+cropped_image = crop_img(image, roi_box)
+```
 ## Face Crop Result
 
 In Train datasets, **we did not use MMOD** CNN crop because it takes too much time (70seconds per 12 images).
@@ -136,10 +140,28 @@ And by researching more, we found **Patch Gan** which uses **Unet** to connect l
 
 ## Pixel to Pixel Gan
 
+![](./Git_images/Untitled-1cd80787-f4cf-4c0e-9a72-313cc1725954.png)
+
 ![](./Git_images/Untitled-3e87669b-ad82-44e5-9d42-3268ec8ebb9a.png)
 
-![](./Git_images/Untitled-1cd80787-f4cf-4c0e-9a72-313cc1725954.png)
 
 **Generator: Same as previous model (VGG16 + Unet)**
 
 **Discriminator: Patch Gan**
+
+# Dependency
+- Python 3
+- Python Image Library
+- Anaconda
+
+- Keras
+- Tensorflow
+- VGG16 Face
+- Dlib 
+
+- Django
+
+- Numpy
+- Opencv
+- Matplotlib
+- Glob
