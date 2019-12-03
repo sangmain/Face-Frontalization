@@ -24,26 +24,26 @@ batch_size = 32
 epochs = 2000
 epoch_interval = 20
 
-try_cnt = '\\04'
+try_cnt = '05'
 
-save_path = 'D:\\Sangmin\\BITProjects\\RESULT\\' + try_cnt
+save_path = os.path.join("./RESULT", try_cnt)
 print(save_path)
 
 ############ 데이터 읽어오기
-X_train = np.load("lsm/n_npy/" + str(shape) + "/merged_x.npy")
-Y_train = np.load("lsm/n_npy/" + str(shape) + "/merged_y.npy")
+X_train = np.load("./npy/merged_x.npy")
+Y_train = np.load("./npy/merged_y.npy")
 
 
-X_test = np.load("lsm/n_npy/" + str(shape) + "/merged_xtest.npy")
-Y_test = np.load("lsm/n_npy/" + str(shape) + "/merged_ytest.npy")
+X_test = np.load("./npy/merged_xtest.npy")
+Y_test = np.load("./npy/merged_ytest.npy")
 
 print("X_train: ", X_train.shape)
 print("Y_Train: ", Y_train.shape)
 
-X_train = X_train / 255.
-Y_train = Y_train / 255.
+X_train = X_train / 127.5 - 1
+Y_train = Y_train / 127.5 - 1
 
-X_test = X_test / 255.
+X_test = X_test / 127.5 - 1
 # Y_train = Y_train / 127.5 - 1
 if len(X_train) == 0 or len(Y_train) == 0:
     print("empty")
@@ -66,27 +66,32 @@ def build_model():
     conv4 = vgg.get_layer("conv4_3").output
     conv5 = vgg.get_layer("conv5_3").output
   
-    x = Conv2D(512, (3,3), activation='relu', padding='same')(last_layer)
+    x = Conv2D(512, (3,3), padding='same')(last_layer)
     x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
     layers = Concatenate(axis=-1) ([x, conv5])
-    x = Conv2D(512, (3,3), activation='relu', padding='same')(layers)
+    x = Conv2D(512, (3,3), padding='same')(layers)
     x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
     layers = Concatenate(axis=-1) ([x, conv4])
-    x = Conv2D(512, (3,3), activation='relu', padding='same')(layers)
+    x = Conv2D(512, (3,3), padding='same')(layers)
     x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
     layers = Concatenate(axis=-1) ([x, conv3])
-    x = Conv2D(256, (3,3), activation='relu', padding='same')(layers)
+    x = Conv2D(256, (3,3), padding='same')(layers)
     x = BatchNormalization()(x)
+    x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
     layers = Concatenate(axis=-1) ([x, conv2])
-    x = Conv2D(128, (3,3), activation='relu', padding='same')(layers)
+    x = Conv2D(128, (3,3), padding='same')(layers)
+    x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
     decoder = Conv2D(3, (3,3), padding='same')(x)
@@ -134,55 +139,5 @@ def train():
     cb = My_Callback(X_test, Y_test, save_path, epoch_interval=20)
 
     model.fit(X_train, Y_train , batch_size=batch_size, epochs=epochs, callbacks=[cb])
-
-        # print ('\nTraining epoch: %d \nLoss: %f'
-        #     % (i + 1, loss))
-
-        # if i % epoch_interval == 0:
-        #     model.save(save_path + '/model_'+ str(i) + '.h5')            
-        #     X_test = DGP.__getitem__(0)
-
-        #     y_pred = model.predict(X_test) * 0.5 + 0.5
-        #     train_pred = model.predict(X_train) * 0.5 + 0.5
-        #     X_test = X_test * 0.5 + 0.5
-        #     X_train = X_train * 0.5 + 0.5
-        #     for k in range(len(X_test)):
-        #         fig = plt.figure(figsize=(8, 2))
-
-        #         plot = fig.add_subplot(1, 4, 1)
-        #         plot.set_title('X_train')
-        #         plt.imshow(X_train[k])
-
-        #         ############ prediction image
-        #         # pred = y_pred[0].reshape(shape,shape, 3)    
-
-        #         plot = fig.add_subplot(1, 4, 2)
-        #         plot.set_title('train_pred')
-        #         plt.imshow(train_pred[k])
-
-        #         plot = fig.add_subplot(1, 4, 3)
-        #         plot.set_title('x_test')
-        #         plt.imshow(X_test[k])
-
-        #         ############ prediction image
-        #         # pred = y_pred[0].reshape(shape,shape, 3)    
-
-        #         plot = fig.add_subplot(1, 4, 4)
-        #         plot.set_title('predict')
-        #         plt.imshow(y_pred[k])
-
-        #         plt_savepath = '%d-%d.png' % (i, k)
-        #         plt.savefig(save_path +'\\' + plt_savepath)
-        #         plt.close()
-                
-
-
-        # DG.on_epoch_end()
-        # DGP.on_epoch_end()
-
-        # end = time.time()
-        # print("time per epoch: ", format(end - start, '.2f'))
-
-
 
 train()
