@@ -43,7 +43,7 @@ print("Y_Train: ", Y_train.shape)
 X_train = X_train / 127.5 - 1
 Y_train = Y_train / 127.5 - 1
 
-X_test = X_test / 127.5 - 1
+X_test = X_test / 255.
 # Y_train = Y_train / 127.5 - 1
 if len(X_train) == 0 or len(Y_train) == 0:
     print("empty")
@@ -141,3 +141,4 @@ def train():
     model.fit(X_train, Y_train , batch_size=batch_size, epochs=epochs, callbacks=[cb])
 
 train()
+

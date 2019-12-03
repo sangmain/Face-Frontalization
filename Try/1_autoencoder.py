@@ -4,7 +4,7 @@ import PIL.Image as pilimg
 import random
 from glob import glob
 
-from datagenerator_read_dir_face import DataGenerator, DataGenerator_predict
+from datagenerator import DataGenerator, DataGenerator_predict
 from keras_vggface.vggface import VGGFace
 from keras import backend as K
 from keras.models import Sequential, Model
@@ -21,10 +21,10 @@ batch_size = 32
 epochs = 600
 epoch_interval = 20
 
-try_cnt = '\\08'
+try_cnt = '07'
 
-data_path = "D:\\Data\\128\\merged\\"
-save_path = 'D:\\Sangmin\\BITProjects\\RESULT\\' + try_cnt
+data_path = "./../merged_ext//"
+save_path = os.path.join("./RESULT", try_cnt)
 print(save_path)
 
 ############ 데이터 읽어오기
@@ -43,73 +43,57 @@ DG = DataGenerator(X_train, Y_train, batch_size= batch_size, dim= (shape, shape)
 DGP = DataGenerator_predict(X_test, batch_size= batch_size, dim= (shape, shape))
 
 ########### 모델 구성
-# vgg = VGGFace(include_top=False, model="vgg16", input_shape=(shape, shape, 3), weights= 'vggface')
-# vgg.trainable = False
+vgg = VGGFace(include_top=False, model="vgg16", input_shape=(shape, shape, 3), weights= 'vggface')
+vgg.trainable = False
 
 def build_model():
     inputs = Input(shape=(128, 128, 3))
 
-    x = Conv2D(32, (3,3), padding='same')(inputs)
-    x = BatchNormalization()(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(2)(x)
-
-    x = Conv2D(64, (3,3), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(2)(x)
-    
-    x = Conv2D(128, (3,3), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(2)(x)
-  
-    x = Conv2D(256, (3,3), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(2)(x)
-
-    x = Conv2D(512, (3,3), padding='same')(x)
-    x = BatchNormalization()(x)
-    x = LeakyReLU()(x)
-    x = MaxPooling2D(2)(x)
+    last_layer = vgg.get_layer('pool5').output
+    # vgg_model.summary()
+    conv2 = vgg.get_layer("conv2_2").output
+    conv3 = vgg.get_layer("conv3_3").output
+    conv4 = vgg.get_layer("conv4_3").output
+    conv5 = vgg.get_layer("conv5_3").output
 
 
 
-    x = Conv2D(512, (3,3), padding='same')(x)
+    x = Conv2D(512, (3,3), padding='same')(last_layer)
     x = BatchNormalization()(x)
     x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
-    x = Conv2D(256, (3,3), padding='same')(x)
+    layers = Concatenate(axis=-1) ([x, conv5])
+    x = Conv2D(512, (3,3), activation='relu', padding='same')(layers)
     x = BatchNormalization()(x)
     x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
-    x = Conv2D(128, (3,3), padding='same')(x)
+    layers = Concatenate(axis=-1) ([x, conv4])
+    x = Conv2D(512, (3,3), activation='relu', padding='same')(layers)
     x = BatchNormalization()(x)
     x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
-    x = Conv2D(64, (3,3), padding='same')(x)
+    layers = Concatenate(axis=-1) ([x, conv3])
+    x = Conv2D(256, (3,3), activation='relu', padding='same')(layers)
     x = BatchNormalization()(x)
     x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
-    x = Conv2D(32, (3,3), padding='same')(x)
+    layers = Concatenate(axis=-1) ([x, conv2])
+    x = Conv2D(128, (3,3), activation='relu', padding='same')(layers)
     x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
-
 
     decoder = Conv2D(3, (3,3), padding='same')(x)
 
-    # model = Model(vgg.input, decoder)c
-    model = Model(inputs, decoder)
-
-    # for layer in model.layers:
-    #         layer.trainable = False
-    #         if layer.name == "pool5":
-    #             break
+    model = Model(vgg.input, decoder)
+    for layer in model.layers:
+            layer.trainable = False
+            # print(layer.get_weights())
+            if layer.name == "pool5":
+                break
 
     model.compile(loss='mse', optimizer='adam')
 
@@ -137,6 +121,20 @@ def show_graph(history):
     plt.legend(['train r2_score', 'test r2_score'], loc='upper left')
     plt.show()
 
+from keras_preprocessing import image
+def plot_image(images, preds, index, fig):
+        img = images[index-1]
+        img = image.array_to_img(img)
+        plot = fig.add_subplot(2, 3, index)
+        plot.set_xticks([])
+        plot.set_yticks([])
+        plt.imshow(img)
+
+        plot = fig.add_subplot(2, 3, index + 3)
+        plot.set_xticks([])
+        plot.set_yticks([])
+        pred = image.array_to_img(preds[index - 1 ])
+        plt.imshow(pred)
 
 def train():
     model = build_model()
@@ -147,48 +145,44 @@ def train():
     for i in range(epochs):
         start = time.time()
         for j in range(DG.__len__()):
-            X_train, _ = DG.__getitem__(j)
-            loss = model.train_on_batch(X_train, X_train)
+            X_train, Y_train = DG.__getitem__(j)
+            loss = model.train_on_batch(X_train, Y_train)
 
 
         print ('\nTraining epoch: %d \nLoss: %f'
             % (i + 1, loss))
 
         if i % epoch_interval == 0:
-            model.save(save_path + '/model_'+ str(i) + '.h5')            
+            model.save(save_path + '/model_'+ str(i) + '.h5')           
             X_test = DGP.__getitem__(0)
+            print(X_test.shape)
+            for k in range(10):
+                images=[]
+                for l in range(3):
+                    num = random.randint(0, len(X_test)-1)
+                    print('random: ', num)
+                    img_tensor = X_test[num]
+                    images.append(img_tensor)
 
-            y_pred = model.predict(X_test) * 0.5 + 0.5
-            train_pred = model.predict(X_train) * 0.5 + 0.5
-            X_test = X_test * 0.5 + 0.5
-            X_train = X_train * 0.5 + 0.5
-            for k in range(len(X_test)):
-                fig = plt.figure(figsize=(8, 2))
+                images = np.array(images)
+                print(images.shape)
 
-                plot = fig.add_subplot(1, 4, 1)
-                plot.set_title('X_train')
-                plt.imshow(X_train[k])
+                proc_images = images         
+                y_pred = model.predict(proc_images)
+                # y_pred = y_pred * 0.5 + 0.5
 
-                ############ prediction image
-                # pred = y_pred[0].reshape(shape,shape, 3)    
+                fig = plt.figure()
+                ############ x_test image
+                # test = rand_img.reshape(shape,shape, 3)
 
-                plot = fig.add_subplot(1, 4, 2)
-                plot.set_title('train_pred')
-                plt.imshow(train_pred[k])
+                plot_image(images, y_pred, 1, fig)
+                plot_image(images, y_pred, 2, fig)
+                plot_image(images, y_pred, 3, fig)
 
-                plot = fig.add_subplot(1, 4, 3)
-                plot.set_title('x_test')
-                plt.imshow(X_test[k])
 
-                ############ prediction image
-                # pred = y_pred[0].reshape(shape,shape, 3)    
+                # plt.show()
+                plt.savefig(save_path + "\\" + str(i) + "_" + str(k) + ".png")
 
-                plot = fig.add_subplot(1, 4, 4)
-                plot.set_title('predict')
-                plt.imshow(y_pred[k])
-
-                plt_savepath = '%d-%d.png' % (i, k)
-                plt.savefig(save_path +'\\' + plt_savepath)
                 plt.close()
                 
 
@@ -202,3 +196,5 @@ def train():
 
 
 train()
+
+
