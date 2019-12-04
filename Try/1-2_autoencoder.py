@@ -24,7 +24,7 @@ batch_size = 32
 epochs = 2000
 epoch_interval = 20
 
-try_cnt = 'new_02'
+try_cnt = 'new_03'
 
 save_path = os.path.join("./RESULT", try_cnt)
 print(save_path)
@@ -40,10 +40,10 @@ Y_test = np.load("./npy/merged_ytest.npy")
 print("X_train: ", X_train.shape)
 print("Y_Train: ", Y_train.shape)
 
-X_train = X_train / 127.5 -1
-Y_train = Y_train / 127.5 -1
+X_train = X_train / 255.
+Y_train = Y_train / 255.
 
-X_test = X_test / 127.5 -1
+X_test = X_test / 255.
 if len(X_train) == 0 or len(Y_train) == 0:
     print("empty")
     sys.exit()
@@ -72,25 +72,25 @@ def build_model():
     x = UpSampling2D(2)(x)
 
     layers = Concatenate(axis=-1) ([x, conv5])
-    x = Conv2D(512, (3,3), activation='relu', padding='same')(layers)
+    x = Conv2D(512, (3,3), padding='same')(layers)
     x = BatchNormalization()(x)
     x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
     layers = Concatenate(axis=-1) ([x, conv4])
-    x = Conv2D(512, (3,3), activation='relu', padding='same')(layers)
+    x = Conv2D(512, (3,3), padding='same')(layers)
     x = BatchNormalization()(x)
     x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
     layers = Concatenate(axis=-1) ([x, conv3])
-    x = Conv2D(256, (3,3), activation='relu', padding='same')(layers)
+    x = Conv2D(256, (3,3), padding='same')(layers)
     x = BatchNormalization()(x)
     x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
     layers = Concatenate(axis=-1) ([x, conv2])
-    x = Conv2D(128, (3,3), activation='relu', padding='same')(layers)
+    x = Conv2D(128, (3,3), padding='same')(layers)
     x = LeakyReLU()(x)
     x = UpSampling2D(2)(x)
 
