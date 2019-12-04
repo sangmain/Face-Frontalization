@@ -24,7 +24,7 @@ batch_size = 32
 epochs = 2000
 epoch_interval = 20
 
-try_cnt = 'new_01'
+try_cnt = 'new_02'
 
 save_path = os.path.join("./RESULT", try_cnt)
 print(save_path)
@@ -40,10 +40,10 @@ Y_test = np.load("./npy/merged_ytest.npy")
 print("X_train: ", X_train.shape)
 print("Y_Train: ", Y_train.shape)
 
-X_train = X_train / 255.
-Y_train = Y_train / 255.
+X_train = X_train / 127.5 -1
+Y_train = Y_train / 127.5 -1
 
-X_test = X_test / 255.
+X_test = X_test / 127.5 -1
 if len(X_train) == 0 or len(Y_train) == 0:
     print("empty")
     sys.exit()
